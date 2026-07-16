@@ -26,7 +26,7 @@ func (r *UserRepository) CreateUser(user *models.User) error {
 
 	query := `
 	INSERT INTO users
-	(id, full_name, email, password)
+	(id, full_name, email, password_hash)
 	VALUES ($1,$2,$3,$4)
 	`
 
@@ -46,7 +46,7 @@ func (r *UserRepository) CreateUser(user *models.User) error {
 func (r *UserRepository) GetUserByEmail(email string) (*models.User, error) {
 
 	query := `
-	SELECT id, full_name, email, password, created_at, updated_at
+	SELECT id, full_name, email, password_hash, created_at, updated_at
 	FROM users
 	WHERE email=$1
 	`

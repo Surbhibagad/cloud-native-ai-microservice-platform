@@ -50,3 +50,25 @@ func (s *AuthService) Register(req *models.RegisterRequest) error {
 	// Save to database
 	return s.UserRepo.CreateUser(user)
 }
+
+func (s *AuthService) Login(req *models.LoginRequest, jwtSecret string) (string, error) {
+
+	// Find user by email
+	user, err := s.UserRepo.GetUserByEmail(req.Email)
+	if err != nil {
+		return "", errors.New("invalid email or password")
+	}
+
+	// Verify password
+	if !utils.CheckPassword(req.Password, user.Password) {
+		return "", errors.New("invalid email or password")
+	}
+
+	// Generate JWT
+	token, err := utils.GenerateJWT(user.ID, jwtSecret)
+	if err != nil {
+		return "", err
+	}
+
+	return token, nil
+}
