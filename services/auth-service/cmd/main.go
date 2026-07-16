@@ -28,7 +28,7 @@ func main() {
 	authService := services.NewAuthService(userRepo)
 
 	// Handler
-	authHandler := handlers.NewAuthHandler(authService)
+	authHandler := handlers.NewAuthHandler(authService, cfg.JWTSecret)
 
 	router := gin.Default()
 
@@ -40,7 +40,7 @@ func main() {
 	})
 
 	// API Routes
-	routes.SetupRoutes(router, authHandler)
+	routes.SetupRoutes(router, authHandler, cfg)
 
 	log.Println("Server running on port", cfg.Port)
 

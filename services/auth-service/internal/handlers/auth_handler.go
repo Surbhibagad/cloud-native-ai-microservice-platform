@@ -11,11 +11,13 @@ import (
 
 type AuthHandler struct {
 	AuthService *services.AuthService
+	JWTSecret   string
 }
 
-func NewAuthHandler(service *services.AuthService) *AuthHandler {
+func NewAuthHandler(service *services.AuthService, jwtSecret string) *AuthHandler {
 	return &AuthHandler{
 		AuthService: service,
+		JWTSecret:   jwtSecret,
 	}
 }
 
@@ -55,7 +57,7 @@ func (h *AuthHandler) Login(c *gin.Context) {
 		return
 	}
 
-	token, err := h.AuthService.Login(&req, "my_super_secret_key")
+	token, err := h.AuthService.Login(&req, h.JWTSecret)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"error": err.Error(),
@@ -65,5 +67,25 @@ func (h *AuthHandler) Login(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"token": token,
+	})
+}
+
+func (h *AuthHandler) Profile(c *gin.Context) {
+
+	userID := c.GetString("userID")
+
+	user, err := h.AuthService.GetProfile(userID)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{
+			"error": "User not found",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"id":         user.ID,
+		"full_name":  user.FullName,
+		"email":      user.Email,
+		"created_at": user.CreatedAt,
 	})
 }

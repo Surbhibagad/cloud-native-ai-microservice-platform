@@ -72,3 +72,13 @@ func (s *AuthService) Login(req *models.LoginRequest, jwtSecret string) (string,
 
 	return token, nil
 }
+
+func (s *AuthService) GetProfile(userID string) (*models.User, error) {
+
+	user, err := s.UserRepo.GetUserByID(userID)
+	if err != nil {
+		return nil, err
+	}
+
+	return user, nil
+}
